@@ -1,0 +1,316 @@
+import React, { useState, useEffect } from "react";
+import moon from "../images/icon-moon.svg";
+import sun from "../images/icon-sun.svg";
+import cross from "../images/icon-cross.svg";
+import check from "../images/icon-check.svg";
+
+const Home = ({ change, mode }) => {
+  const [allTodo, setAllTodo] = useState([]);
+  const [complete, setComplete] = useState([]);
+  const [todo, setTodo] = useState("");
+  const [temp, setTemp] = useState([]);
+  const [notification, setNotification] = useState("All");
+  // const [mode, setMode] = useState(true);
+
+  // const change = () => {
+  //   setMode(!mode);
+  //   const body = document.querySelector("body");
+  //   document.querySelector(".circle").style.border = "1px solid black";
+  //   if (mode) {
+  //     body.style.backgroundColor = "hsl(0, 0%, 98%)";
+  //   } else {
+  //     body.style.backgroundColor = "hsl(237, 14%, 26%)";
+  //   }
+  // };
+
+  const submitTodo = (e) => {
+    e.preventDefault();
+    var x = [];
+    x = allTodo;
+    if (!allTodo.includes(todo)) {
+      setAllTodo([...allTodo, todo]);
+      x = [...x, todo];
+      setTemp(allTodo);
+      localStorage.setItem("all", JSON.stringify(x));
+    }
+    setTemp(x);
+  };
+
+  const completeTodo = (item) => {
+    var x = [];
+    x = complete;
+    if (!complete.includes(item)) {
+      setComplete([...complete, item]);
+      x = [...x, item];
+      localStorage.setItem("complete", JSON.stringify(x));
+    } else {
+      var newComplete = complete.filter(function (value) {
+        return value !== item;
+      });
+      setComplete(newComplete);
+      var y = newComplete;
+      localStorage.setItem("complete", JSON.stringify(y));
+      if (notification === "Completed" && y.length === 0) {
+        setTemp(allTodo);
+        setNotification("All");
+      }
+    }
+  };
+
+  const clearCompleted = () => {
+    localStorage.removeItem("complete");
+    var newTodo = allTodo.filter(function (value) {
+      return !complete.includes(value);
+    });
+    setComplete([]);
+    localStorage.setItem("all", JSON.stringify(newTodo));
+    setAllTodo(newTodo);
+    setTemp(newTodo);
+    setNotification("All");
+  };
+
+  const removeTodo = (item) => {
+    if (complete.includes(item)) {
+      var newComplete = complete.filter(function (value) {
+        return value !== item;
+      });
+      setComplete(newComplete);
+      localStorage.setItem("complete", JSON.stringify(newComplete));
+    }
+    var newItems = allTodo.filter(function (value) {
+      return value !== item;
+    });
+    setAllTodo(newItems);
+    localStorage.setItem("all", JSON.stringify(newItems));
+    setTemp(newItems);
+  };
+
+  const filterTodo = (e) => {
+    if (e === "All") {
+      setTemp(allTodo);
+      setNotification("All");
+    } else if (e === "Completed") {
+      setTemp(complete);
+      setNotification("Completed");
+    } else if (e === "Active") {
+      var activeTodo = allTodo.filter(function (value) {
+        return !complete.includes(value);
+      });
+      setTemp(activeTodo);
+      setNotification("Active");
+    }
+  };
+
+  useEffect(() => {
+    const total = localStorage.getItem("all");
+    const completed = localStorage.getItem("complete");
+    var y = JSON.parse(total);
+    if (total) {
+      setAllTodo(() => y);
+      setTemp(() => y);
+    }
+    if (completed) {
+      setComplete(JSON.parse(completed));
+    }
+    setNotification("");
+  }, []);
+
+  return (
+    <div className={mode ? "container-fluid" : "container-fluid dark-mode"}>
+      <div className={mode ? "cover-img" : "dark-img"}></div>
+      <div className="container-div">
+        <header className="header">
+          <h1>TODO</h1>
+          {mode ? (
+            <img
+              src={moon}
+              alt="img mode"
+              className="img-mode"
+              onClick={change}
+            />
+          ) : (
+            <img
+              src={sun}
+              alt="img mode"
+              className="img-mode"
+              onClick={change}
+            />
+          )}
+        </header>
+
+        <main>
+          <form onSubmit={submitTodo}>
+            <div className={mode ? "input-div" : "input-div background-dark"}>
+              <div className="circle" onClick={submitTodo}></div>
+              <input
+                type="text"
+                className={
+                  mode ? "input-tab" : "input-tab background-dark dark-text"
+                }
+                placeholder="Create a new todo..."
+                onChange={(e) => setTodo(e.target.value)}
+                onBlur={(e) => setTodo(e.target.value)}
+              />
+            </div>
+          </form>
+
+          <div className={mode ? "todo-list" : "todo-list background-dark"}>
+            {(() => {
+              if (temp && temp.length >= 1) {
+                return (
+                  <div>
+                    {temp.map((item) => (
+                      <div className="todo-item" key={item}>
+                        <div className="content">
+                          <div
+                            className={
+                              complete.includes(item)
+                                ? "circle-colored"
+                                : "circle"
+                            }
+                            onClick={() => completeTodo(item)}
+                          >
+                            {complete.includes(item) ? (
+                              <img
+                                src={check}
+                                alt="cross"
+                                className="icon-check"
+                              />
+                            ) : (
+                              " "
+                            )}
+                          </div>
+                          <p
+                            className={
+                              complete.includes(item)
+                                ? "todo-p completed-p"
+                                : "todo-p"
+                            }
+                          >
+                            {item}
+                          </p>
+                        </div>
+                        <img
+                          src={cross}
+                          alt="cross"
+                          className="cross"
+                          onClick={() => removeTodo(item)}
+                        />
+                      </div>
+                    ))}
+                    <div className="menu">
+                      <p>{allTodo.length - complete.length} items left</p>
+                      <div>
+                        <p
+                          className={
+                            notification === "All" || notification === ""
+                              ? "menu-toggle filter"
+                              : "menu-toggle"
+                          }
+                          onClick={() => filterTodo("All")}
+                        >
+                          All
+                        </p>
+                        <p
+                          className={
+                            notification === "Active"
+                              ? "menu-toggle filter"
+                              : "menu-toggle"
+                          }
+                          onClick={() => filterTodo("Active")}
+                        >
+                          Active
+                        </p>
+                        <p
+                          className={
+                            notification === "Completed"
+                              ? "menu-toggle filter"
+                              : "menu-toggle"
+                          }
+                          onClick={() => filterTodo("Completed")}
+                        >
+                          Completed
+                        </p>
+                      </div>
+                      <p className="last" onClick={clearCompleted}>
+                        Clear Completed
+                      </p>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div>
+                    <p className="empty">No {notification} todo item yet</p>
+                    <div className="menu">
+                      <p>{allTodo.length - complete.length} items left</p>
+                      <div>
+                        <p
+                          className={
+                            notification === "All" || notification === ""
+                              ? "menu-toggle filter"
+                              : "menu-toggle"
+                          }
+                          onClick={() => filterTodo("All")}
+                        >
+                          All
+                        </p>
+                        <p
+                          className={
+                            notification === "Active"
+                              ? "menu-toggle filter"
+                              : "menu-toggle"
+                          }
+                          onClick={() => filterTodo("Active")}
+                        >
+                          Active
+                        </p>
+                        <p
+                          className={
+                            notification === "Completed"
+                              ? "menu-toggle filter"
+                              : "menu-toggle"
+                          }
+                          onClick={() => filterTodo("Completed")}
+                        >
+                          Completed
+                        </p>
+                      </div>
+                      <p className="last" onClick={clearCompleted}>
+                        Clear Completed
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+            })()}
+          </div>
+          <div className={mode ? "second-menu" : "second-menu dark-one"}>
+            <p
+              onClick={() => filterTodo("All")}
+              className={
+                notification === "All" || notification === "" ? "filter" : ""
+              }
+            >
+              All
+            </p>
+            <p
+              onClick={() => filterTodo("Active")}
+              className={notification === "Active" ? "filter" : ""}
+            >
+              Active
+            </p>
+            <p
+              onClick={() => filterTodo("Completed")}
+              className={notification === "Completed" ? "filter" : ""}
+            >
+              Completed
+            </p>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Home;

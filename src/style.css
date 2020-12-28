@@ -1,0 +1,257 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: "Josefin Sans", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: hsl(0, 0%, 98%);
+  min-width: 375px;
+  font-size: 1.5em;
+}
+
+.container {
+  background: hsl(0, 0%, 98%) url("./images/bg-mobile-light.jpg") no-repeat;
+  background-size: cover;
+  height: 200px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.container-fluid {
+  height: 100vh;
+}
+.cover-img {
+  background: hsl(0, 0%, 98%) url("./images/bg-mobile-light.jpg") no-repeat;
+  background-size: cover;
+  height: 200px;
+  width: 100%;
+  color: hsl(235, 19%, 35%) !important;
+}
+
+.dark-img {
+  background: hsl(237, 14%, 26%) url("./images/bg-mobile-dark.jpg") no-repeat;
+  background-size: cover;
+  height: 200px;
+  width: 100%;
+  color: hsl(234, 39%, 85%) !important;
+}
+
+.container-div {
+  position: relative;
+  bottom: 200px;
+}
+
+.header {
+  width: 100%;
+  height: 200px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.img-mode {
+  height: 30px;
+  margin-top: 40px;
+  margin-right: 20px;
+}
+
+h1 {
+  margin: 0;
+  padding: 40px 20px;
+  color: white;
+  letter-spacing: 0.3em;
+}
+
+.input-div,
+.todo-list,
+.second-menu {
+  width: 90%;
+  height: 70px;
+  background-color: white;
+  border-radius: 5px;
+  position: relative;
+  bottom: 100px;
+  margin: 0 auto;
+}
+
+.background-dark {
+  background-color: hsl(237, 14%, 26%);
+}
+
+.todo-list {
+  height: 100%;
+  bottom: 80px;
+}
+
+.circle,
+.circle-colored {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid grey;
+  margin: 0px 15px 0 20px;
+  float: left;
+  align-self: center;
+}
+
+.input-tab {
+  height: 70px;
+  width: 80%;
+  font-size: 1.2em;
+  border: none;
+}
+
+.input-div {
+  display: flex;
+}
+
+.todo-item {
+  display: flex;
+  align-content: center;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+}
+
+.content {
+  flex: 0 0 90%;
+  display: flex;
+}
+
+.todo-p {
+  max-width: 75%;
+}
+
+.cross {
+  height: 100%;
+  align-self: center;
+  margin-right: 20px;
+}
+
+.empty {
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+.menu,
+.second-menu {
+  display: flex;
+  justify-content: space-around;
+}
+
+.menu div {
+  align-self: center;
+}
+.menu div p {
+  padding: 0 5px;
+}
+
+.second-menu {
+  bottom: 50px;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.second-menu p {
+  padding: 0 5px;
+  font-weight: 700;
+  font-size: 18px;
+}
+.menu p,
+.second-menu p {
+  /* padding: 5px; */
+  color: grey;
+}
+
+.menu-toggle {
+  visibility: hidden;
+  display: none;
+}
+
+.circle-colored {
+  background-image: linear-gradient(hsl(192, 100%, 67%), hsl(280, 87%, 65%));
+  display: flex;
+  align-content: center;
+}
+.icon-check {
+  height: 50%;
+  margin: 0 auto;
+  text-align: center;
+  align-self: center;
+}
+
+.completed-p {
+  text-decoration: line-through;
+  color: hsl(236, 9%, 61%);
+}
+.dark-mode {
+  background-color: hsl(235, 24%, 19%);
+  color: hsl(234, 39%, 85%) !important;
+}
+.dark-one {
+  background-color: hsl(237, 14%, 26%);
+  color: hsl(234, 39%, 85%) !important;
+}
+
+.dark-text {
+  color: hsl(234, 39%, 85%) !important;
+}
+
+.menu p:hover,
+.second-menu p:hover {
+  cursor: pointer;
+  color: hsl(235, 19%, 35%);
+}
+
+p:hover {
+  cursor: pointer;
+}
+.circle:hover,
+.circle-colored:hover {
+  cursor: pointer;
+}
+
+.filter {
+  color: hsl(220, 98%, 61%) !important;
+}
+
+@media only screen and (min-width: 760px) {
+  body {
+    min-width: 1300px;
+  }
+  .menu-toggle {
+    visibility: visible;
+    display: initial;
+  }
+
+  .second-menu {
+    display: none;
+  }
+
+  .container-div {
+    max-width: 50%;
+    margin: 0 auto;
+  }
+
+  .cover-img {
+    background: hsl(0, 0%, 98%) url("./images/bg-desktop-light.jpg") no-repeat;
+    background-size: cover;
+    height: 200px;
+    width: 100%;
+  }
+
+  .dark-img {
+    background: hsl(237, 14%, 26%) url("./images/bg-desktop-dark.jpg") no-repeat;
+    background-size: cover;
+    height: 200px;
+    width: 100%;
+  }
+}
