@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useRef } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import moon from "../images/icon-moon.svg";
 import sun from "../images/icon-sun.svg";
 import cross from "../images/icon-cross.svg";
@@ -6,101 +6,125 @@ import check from "../images/icon-check.svg";
 
 const todoReducer = (state, action) => {
   switch (action.type) {
-    case "SAVED TODO":
-      return [...state, ...action.payload];
-
-    case "CREATE TODO":
-      var newTodo = {
-        item: action.payload,
-        complete: false,
-      };
-      var duplicate = false;
-      state.map((todo) => {
-        if (todo.item === newTodo.item) {
-          return (duplicate = true);
-        } else {
-          return duplicate;
-        }
-      });
-      return duplicate ? state : [...state, newTodo];
-
     case "DO TODO":
-      return state.map((todo) => {
-        if (todo.item === action.payload) {
-          return { ...todo, complete: true };
-        } else {
-          return todo;
-        }
-      });
+      break;
 
     case "UNDO TODO":
-      return state.map((todo) => {
-        if (todo.item === action.payload) {
-          return { ...todo, complete: false };
-        } else {
-          return todo;
-        }
-      });
+      break;
 
     case "REMOVE TODO":
-      return state.filter((todo) => todo.item !== action.payload);
+      break;
 
     case "CLEAR COMPLETE":
-      return state.filter((todo) => !todo.complete);
+      break;
 
     default:
-      return state;
+      throw new Error();
   }
 };
 const Home = ({ change, mode }) => {
+  const [allTodo, setAllTodo] = useState([]);
+  const [complete, setComplete] = useState([]);
   const [todo, setTodo] = useState("");
   const [temp, setTemp] = useState([]);
-  const [notification, setNotification] = useState("");
+  const [notification, setNotification] = useState("All");
 
-  const [todoList, dispatchTodo] = useReducer(todoReducer, []);
-  const firstLoad = useRef(false);
+  const [todoList, dispatchTodo] = useReducer(todoReducer, {
+    item: "",
+    complete: false,
+  });
 
   const submitTodo = (e) => {
     e.preventDefault();
-    dispatchTodo({
-      type: "CREATE TODO",
-      payload: todo,
-    });
+    var x = [];
+    x = allTodo;
+    if (!allTodo.includes(todo)) {
+      setAllTodo([...allTodo, todo]);
+      x = [...x, todo];
+      setTemp(allTodo);
+      localStorage.setItem("all", JSON.stringify(x));
+    }
+    setTemp(x);
   };
 
-  const handleTodo = (todo) => {
-    dispatchTodo({
-      type: todo.complete ? "UNDO TODO" : "DO TODO",
-      payload: todo.item,
+  const completeTodo = (item) => {
+    var x = [];
+    x = complete;
+    if (!complete.includes(item)) {
+      setComplete([...complete, item]);
+      x = [...x, item];
+      localStorage.setItem("complete", JSON.stringify(x));
+    } else {
+      var newComplete = complete.filter(function (value) {
+        return value !== item;
+      });
+      setComplete(newComplete);
+      var y = newComplete;
+      localStorage.setItem("complete", JSON.stringify(y));
+      if (notification === "Completed" && y.length === 0) {
+        setTemp(allTodo);
+        setNotification("All");
+      }
+    }
+  };
+
+  const clearCompleted = () => {
+    localStorage.removeItem("complete");
+    var newTodo = allTodo.filter(function (value) {
+      return !complete.includes(value);
     });
+    setComplete([]);
+    localStorage.setItem("all", JSON.stringify(newTodo));
+    setAllTodo(newTodo);
+    setTemp(newTodo);
+    setNotification("All");
+  };
+
+  const removeTodo = (item) => {
+    if (complete.includes(item)) {
+      var newComplete = complete.filter(function (value) {
+        return value !== item;
+      });
+      setComplete(newComplete);
+      localStorage.setItem("complete", JSON.stringify(newComplete));
+    }
+    var newItems = allTodo.filter(function (value) {
+      return value !== item;
+    });
+    setAllTodo(newItems);
+    localStorage.setItem("all", JSON.stringify(newItems));
+    setTemp(newItems);
   };
 
   const filterTodo = (e) => {
     if (e === "All") {
-      setTemp(todoList);
-      setNotification("");
+      setTemp(allTodo);
+      setNotification("All");
     } else if (e === "Completed") {
-      setTemp(todoList.filter((todo) => todo.complete));
+      setTemp(complete);
       setNotification("Completed");
     } else if (e === "Active") {
-      setTemp(todoList.filter((todo) => !todo.complete));
+      var activeTodo = allTodo.filter(function (value) {
+        return !complete.includes(value);
+      });
+      setTemp(activeTodo);
       setNotification("Active");
     }
   };
 
   useEffect(() => {
-    if (!firstLoad.current) {
-      firstLoad.current = true;
-      const total = localStorage.getItem("todoList");
-      if (total) {
-        dispatchTodo({ type: "SAVED TODO", payload: JSON.parse(total) });
-        setTemp(todoList);
-      }
-    } else {
-      localStorage.setItem("todoList", JSON.stringify(todoList));
-      setTemp(todoList);
+    const total = localStorage.getItem("all");
+    const completed = localStorage.getItem("complete");
+    var y = JSON.parse(total);
+    if (total) {
+      setAllTodo(() => y);
+      setTemp(() => y);
     }
-  }, [todoList]);
+    if (completed) {
+      setComplete(JSON.parse(completed));
+    }
+    setNotification("");
+  }, []);
 
   return (
     <div className={mode ? "container-fluid" : "container-fluid dark-mode"}>
@@ -143,19 +167,21 @@ const Home = ({ change, mode }) => {
 
           <div className={mode ? "todo-list" : "todo-list background-dark"}>
             {(() => {
-              if (temp.length >= 1) {
+              if (temp && temp.length >= 1) {
                 return (
                   <div>
-                    {temp.map((todo) => (
-                      <div className="todo-item" key={todo.item}>
+                    {temp.map((item) => (
+                      <div className="todo-item" key={item}>
                         <div className="content">
                           <div
                             className={
-                              todo.complete ? "circle-colored" : "circle"
+                              complete.includes(item)
+                                ? "circle-colored"
+                                : "circle"
                             }
-                            onClick={() => handleTodo(todo)}
+                            onClick={() => completeTodo(item)}
                           >
-                            {todo.complete ? (
+                            {complete.includes(item) ? (
                               <img
                                 src={check}
                                 alt="cross"
@@ -167,33 +193,24 @@ const Home = ({ change, mode }) => {
                           </div>
                           <p
                             className={
-                              todo.complete ? "todo-p completed-p" : "todo-p"
+                              complete.includes(item)
+                                ? "todo-p completed-p"
+                                : "todo-p"
                             }
                           >
-                            {todo.item}
+                            {item}
                           </p>
                         </div>
                         <img
                           src={cross}
                           alt="cross"
                           className="cross"
-                          onClick={() =>
-                            dispatchTodo({
-                              type: "REMOVE TODO",
-                              payload: todo.item,
-                            })
-                          }
+                          onClick={() => removeTodo(item)}
                         />
                       </div>
                     ))}
                     <div className="menu">
-                      <p>
-                        {todoList.length >= 1
-                          ? todoList.length -
-                            todoList.filter((todo) => todo.complete).length
-                          : 0}{" "}
-                        items left
-                      </p>
+                      <p>{allTodo.length - complete.length} items left</p>
                       <div>
                         <p
                           className={
@@ -226,14 +243,7 @@ const Home = ({ change, mode }) => {
                           Completed
                         </p>
                       </div>
-                      <p
-                        className="last"
-                        onClick={() =>
-                          dispatchTodo({
-                            type: "CLEAR COMPLETE",
-                          })
-                        }
-                      >
+                      <p className="last" onClick={clearCompleted}>
                         Clear Completed
                       </p>
                     </div>
@@ -244,13 +254,7 @@ const Home = ({ change, mode }) => {
                   <div>
                     <p className="empty">No {notification} todo item yet</p>
                     <div className="menu">
-                      <p>
-                        {todoList.length >= 1
-                          ? todoList.length -
-                            todoList.filter((todo) => todo.complete).length
-                          : 0}{" "}
-                        items left
-                      </p>
+                      <p>{allTodo.length - complete.length} items left</p>
                       <div>
                         <p
                           className={
@@ -283,14 +287,7 @@ const Home = ({ change, mode }) => {
                           Completed
                         </p>
                       </div>
-                      <p
-                        className="last"
-                        onClick={() =>
-                          dispatchTodo({
-                            type: "CLEAR COMPLETE",
-                          })
-                        }
-                      >
+                      <p className="last" onClick={clearCompleted}>
                         Clear Completed
                       </p>
                     </div>
