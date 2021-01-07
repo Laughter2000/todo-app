@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home Has a valid snap short 1`] = `
+<div
+  className="container-fluid dark-mode"
+>
+  <div
+    className="dark-img"
+  />
+  <div
+    className="container-div"
+  >
+    <header
+      className="header"
+    >
+      <h1>
+        TODO
+      </h1>
+      <img
+        alt="img mode"
+        className="img-mode"
+        src="icon-sun.svg"
+      />
+    </header>
+    <main>
+      <form
+        onSubmit={[Function]}
+      >
+        <div
+          className="input-div background-dark"
+        >
+          <div
+            className="circle"
+            onClick={[Function]}
+          />
+          <input
+            className="input-tab background-dark dark-text"
+            onBlur={[Function]}
+            onChange={[Function]}
+            placeholder="Create a new todo..."
+            type="text"
+          />
+        </div>
+      </form>
+      <div
+        className="todo-list background-dark"
+      >
+        <div>
+          <p
+            className="empty"
+          >
+            No 
+            
+             todo item yet
+          </p>
+          <div
+            className="menu"
+          >
+            <p>
+              0
+               
+              items left
+            </p>
+            <div>
+              <p
+                className="menu-toggle filter"
+                onClick={[Function]}
+              >
+                All
+              </p>
+              <p
+                className="menu-toggle"
+                onClick={[Function]}
+              >
+                Active
+              </p>
+              <p
+                className="menu-toggle"
+                onClick={[Function]}
+              >
+                Completed
+              </p>
+            </div>
+            <p
+              className="last"
+              onClick={[Function]}
+            >
+              Clear Completed
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        className="second-menu dark-one"
+      >
+        <p
+          className="filter"
+          onClick={[Function]}
+        >
+          All
+        </p>
+        <p
+          className=""
+          onClick={[Function]}
+        >
+          Active
+        </p>
+        <p
+          className=""
+          onClick={[Function]}
+        >
+          Completed
+        </p>
+      </div>
+    </main>
+  </div>
+</div>
+`;

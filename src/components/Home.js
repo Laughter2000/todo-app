@@ -4,7 +4,7 @@ import sun from "../images/icon-sun.svg";
 import cross from "../images/icon-cross.svg";
 import check from "../images/icon-check.svg";
 
-const todoReducer = (state, action) => {
+export const todoReducer = (state, action) => {
   switch (action.type) {
     case "SAVED TODO":
       return [...state, ...action.payload];
