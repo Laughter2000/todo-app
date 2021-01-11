@@ -52,12 +52,24 @@ export const todoReducer = (state, action) => {
       return state;
   }
 };
+
+const filterReducer = (state, action) => {
+  switch (action.type) {
+    case "SHOW ALL":
+      return "ALL";
+    case "SHOW ACTIVE":
+      return "ACTIVE";
+    case "SHOW COMPLETE":
+      return "COMPLETED";
+    default:
+      throw new Error();
+  }
+};
+
 const Home = ({ change, mode }) => {
   const [todo, setTodo] = useState("");
-  const [temp, setTemp] = useState([]);
-  const [notification, setNotification] = useState("");
-
   const [todoList, dispatchTodo] = useReducer(todoReducer, []);
+  const [filter, dispatchFilter] = useReducer(filterReducer, "ALL");
   const firstLoad = useRef(false);
 
   const submitTodo = (e) => {
@@ -66,6 +78,7 @@ const Home = ({ change, mode }) => {
       type: "CREATE TODO",
       payload: todo,
     });
+    setTodo("");
   };
 
   const handleTodo = (todo) => {
@@ -75,18 +88,30 @@ const Home = ({ change, mode }) => {
     });
   };
 
-  const filterTodo = (e) => {
-    if (e === "All") {
-      setTemp(todoList);
-      setNotification("");
-    } else if (e === "Completed") {
-      setTemp(todoList.filter((todo) => todo.complete));
-      setNotification("Completed");
-    } else if (e === "Active") {
-      setTemp(todoList.filter((todo) => !todo.complete));
-      setNotification("Active");
-    }
+  const handleShowAll = () => {
+    dispatchFilter({ type: "SHOW ALL" });
   };
+
+  const handleShowActive = () => {
+    dispatchFilter({ type: "SHOW ACTIVE" });
+  };
+
+  const handleShowComplete = () => {
+    dispatchFilter({ type: "SHOW COMPLETE" });
+  };
+
+  const filterTodo = todoList.filter((todo) => {
+    if (filter === "ALL") {
+      return true;
+    }
+    if (filter === "ACTIVE" && !todo.complete) {
+      return true;
+    }
+    if (filter === "COMPLETED" && todo.complete) {
+      return true;
+    }
+    return false;
+  });
 
   useEffect(() => {
     if (!firstLoad.current) {
@@ -94,11 +119,9 @@ const Home = ({ change, mode }) => {
       const total = localStorage.getItem("todoList");
       if (total) {
         dispatchTodo({ type: "SAVED TODO", payload: JSON.parse(total) });
-        setTemp(todoList);
       }
     } else {
       localStorage.setItem("todoList", JSON.stringify(todoList));
-      setTemp(todoList);
     }
   }, [todoList]);
 
@@ -134,6 +157,7 @@ const Home = ({ change, mode }) => {
                 className={
                   mode ? "input-tab" : "input-tab background-dark dark-text"
                 }
+                value={todo}
                 placeholder="Create a new todo..."
                 onChange={(e) => setTodo(e.target.value)}
                 onBlur={(e) => setTodo(e.target.value)}
@@ -143,10 +167,10 @@ const Home = ({ change, mode }) => {
 
           <div className={mode ? "todo-list" : "todo-list background-dark"}>
             {(() => {
-              if (temp.length >= 1) {
+              if (filterTodo.length >= 1) {
                 return (
                   <div>
-                    {temp.map((todo) => (
+                    {filterTodo.map((todo) => (
                       <div className="todo-item" key={todo.item}>
                         <div className="content">
                           <div
@@ -197,31 +221,31 @@ const Home = ({ change, mode }) => {
                       <div>
                         <p
                           className={
-                            notification === "All" || notification === ""
+                            filter === "ALL"
                               ? "menu-toggle filter"
                               : "menu-toggle"
                           }
-                          onClick={() => filterTodo("All")}
+                          onClick={handleShowAll}
                         >
                           All
                         </p>
                         <p
                           className={
-                            notification === "Active"
+                            filter === "ACTIVE"
                               ? "menu-toggle filter"
                               : "menu-toggle"
                           }
-                          onClick={() => filterTodo("Active")}
+                          onClick={handleShowActive}
                         >
                           Active
                         </p>
                         <p
                           className={
-                            notification === "Completed"
+                            filter === "COMPLETE"
                               ? "menu-toggle filter"
                               : "menu-toggle"
                           }
-                          onClick={() => filterTodo("Completed")}
+                          onClick={handleShowComplete}
                         >
                           Completed
                         </p>
@@ -242,7 +266,9 @@ const Home = ({ change, mode }) => {
               } else {
                 return (
                   <div>
-                    <p className="empty">No {notification} todo item yet</p>
+                    <p className="empty">
+                      No {filter === "ALL" ? "" : filter} todo item yet
+                    </p>
                     <div className="menu">
                       <p>
                         {todoList.length >= 1
@@ -254,31 +280,31 @@ const Home = ({ change, mode }) => {
                       <div>
                         <p
                           className={
-                            notification === "All" || notification === ""
+                            filter === "ALL"
                               ? "menu-toggle filter"
                               : "menu-toggle"
                           }
-                          onClick={() => filterTodo("All")}
+                          onClick={handleShowAll}
                         >
                           All
                         </p>
                         <p
                           className={
-                            notification === "Active"
+                            filter === "ACTIVE"
                               ? "menu-toggle filter"
                               : "menu-toggle"
                           }
-                          onClick={() => filterTodo("Active")}
+                          onClick={handleShowActive}
                         >
                           Active
                         </p>
                         <p
                           className={
-                            notification === "Completed"
+                            filter === "COMPLETED"
                               ? "menu-toggle filter"
                               : "menu-toggle"
                           }
-                          onClick={() => filterTodo("Completed")}
+                          onClick={handleShowComplete}
                         >
                           Completed
                         </p>
@@ -301,22 +327,20 @@ const Home = ({ change, mode }) => {
           </div>
           <div className={mode ? "second-menu" : "second-menu dark-one"}>
             <p
-              onClick={() => filterTodo("All")}
-              className={
-                notification === "All" || notification === "" ? "filter" : ""
-              }
+              onClick={handleShowAll}
+              className={filter === "ALL" ? "filter" : ""}
             >
               All
             </p>
             <p
-              onClick={() => filterTodo("Active")}
-              className={notification === "Active" ? "filter" : ""}
+              onClick={handleShowActive}
+              className={filter === "ACTIVE" ? "filter" : ""}
             >
               Active
             </p>
             <p
-              onClick={() => filterTodo("Completed")}
-              className={notification === "Completed" ? "filter" : ""}
+              onClick={handleShowComplete}
+              className={filter === "COMPLETED" ? "filter" : ""}
             >
               Completed
             </p>
